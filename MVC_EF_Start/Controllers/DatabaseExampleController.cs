@@ -27,7 +27,7 @@ namespace MVC_EF_Start.Controllers
         {
             // CREATE operation
             Company MyCompany = new Company();
-            MyCompany.symbol = "MCOB";
+            MyCompany.Id = "MCOB";
             MyCompany.name = "ISM";
             MyCompany.date = "ISM";
             MyCompany.isEnabled = true;
@@ -48,27 +48,30 @@ namespace MVC_EF_Start.Controllers
             MyCompanyQuote1.vwap = 9.76F;
             MyCompanyQuote1.label = "Nov 23";
             MyCompanyQuote1.changeOverTime = 0.56F;
-            MyCompanyQuote1.symbol = "MCOB";
+            //MyCompanyQuote1.Id = "MCOB";
+            MyCompanyQuote1.Company = MyCompany;
 
             Quote MyCompanyQuote2 = new Quote();
             //MyCompanyQuote1.EquityId = 123;
-            MyCompanyQuote2.date = "11-23-2018";
-            MyCompanyQuote2.open = 46.13F;
-            MyCompanyQuote2.high = 47.18F;
-            MyCompanyQuote2.low = 44.67F;
-            MyCompanyQuote2.close = 47.01F;
-            MyCompanyQuote2.volume = 37654000;
-            MyCompanyQuote2.unadjustedVolume = 37654000;
+            MyCompanyQuote2.date = "11-25-2018";
+            MyCompanyQuote2.open = 56.13F;
+            MyCompanyQuote2.high = 57.18F;
+            MyCompanyQuote2.low = 54.67F;
+            MyCompanyQuote2.close = 57.01F;
+            MyCompanyQuote2.volume = 47654000;
+            MyCompanyQuote2.unadjustedVolume = 47654000;
             MyCompanyQuote2.change = 1.43F;
             MyCompanyQuote2.changePercent = 0.03F;
             MyCompanyQuote2.vwap = 9.76F;
-            MyCompanyQuote2.label = "Nov 23";
+            MyCompanyQuote2.label = "Nov 25";
             MyCompanyQuote2.changeOverTime = 0.56F;
-            MyCompanyQuote2.symbol = "MCOB";
+            //MyCompanyQuote2.Id = "MCOB1";
+            MyCompanyQuote2.Company = MyCompany;
+
 
 
             User MyUser1 = new User();
-            MyUser1.UserID = "U0001";
+            MyUser1.Id = "U0001";
             MyUser1.firstName = "John";
             MyUser1.middleInitial = "M";
             MyUser1.lastName = "Doe";
@@ -80,11 +83,13 @@ namespace MVC_EF_Start.Controllers
             MyUser1.city = "Tampa";
             MyUser1.state = "FL";
             MyUser1.postalCode = "33560";
+            MyUser1.Accounts = new List<Account>();
+
 
 
             User MyUser2 = new User();
-            MyUser2.UserID = "U0002";
-            MyUser2.firstName = "Jone";
+            MyUser2.Id = "U0002";
+            MyUser2.firstName = "Jane";
             MyUser2.middleInitial = "A";
             MyUser2.lastName = "Doe";
             MyUser2.ssn = "123-45-6700";
@@ -95,26 +100,30 @@ namespace MVC_EF_Start.Controllers
             MyUser2.city = "Tampa";
             MyUser2.state = "FL";
             MyUser2.postalCode = "33562";
+            MyUser2.Accounts = new List<Account>();
+
+
+
 
 
             Account MyAccount1 = new Account();
-            MyAccount1.AccountID = "A000001";
-            MyAccount1.UserID = "U0001";
+            MyAccount1.Id = "A000001";
+            MyAccount1.Owner = MyUser1;
             MyAccount1.friendlyName = "John's IRA";
-
+            MyUser1.Accounts.Add(MyAccount1);
 
             Account MyAccount2 = new Account();
-            MyAccount2.AccountID = "A000002";
-            MyAccount2.UserID = "U0001";
+            MyAccount2.Id = "A000002";
+            MyAccount1.Owner = MyUser1;
             MyAccount2.friendlyName = "John's Stash";
+            MyUser1.Accounts.Add(MyAccount2);
 
 
             Account MyAccount3 = new Account();
-            MyAccount3.AccountID = "A000003";
-            MyAccount3.UserID = "U0002";
+            MyAccount3.Id = "A000003";
+            MyAccount3.Owner = MyUser2;
             MyAccount3.friendlyName = "Jane's Retirement";
-
-
+            MyUser2.Accounts.Add(MyAccount3);
 
 
             dbContext.Companies.Add(MyCompany);
@@ -125,19 +134,28 @@ namespace MVC_EF_Start.Controllers
             dbContext.Accounts.Add(MyAccount1);
             dbContext.Accounts.Add(MyAccount2);
             dbContext.Accounts.Add(MyAccount3);
-
-
             dbContext.SaveChanges();
 
             // READ operation
+
             Company CompanyRead1 = dbContext.Companies
-                                    .Where(c => c.symbol == "MCOB")
+                                    .Where(c => c.Id == "MCOB")
                                     .First();
 
             Company CompanyRead2 = dbContext.Companies
                                     .Include(c => c.Quotes)
-                                    .Where(c => c.symbol == "MCOB")
+                                    .Where(c => c.Id == "MCOB")
                                     .First();
+
+            User UserRead1 = dbContext.Users
+                                  .Where(u => u.Id == "U0001")
+                                  .First();
+
+            User UserRead1A = dbContext.Users
+                                  .Include(u => u.Accounts)
+                                  .Where(u => u.Id == "U0001")
+                                  .First();
+
 
             // UPDATE operation
             CompanyRead1.iexId = "MCOB";
@@ -155,27 +173,32 @@ namespace MVC_EF_Start.Controllers
         public ViewResult LINQOperations()
         {
             Company CompanyRead1 = dbContext.Companies
-                                            .Where(c => c.symbol == "MCOB")
+                                            .Where(c => c.Id == "MCOB")
                                             .First();
 
             Company CompanyRead2 = dbContext.Companies
                                             .Include(c => c.Quotes)
-                                            .Where(c => c.symbol == "MCOB")
+                                            .Where(c => c.Id == "MCOB")
                                             .First();
 
             Quote Quote1 = dbContext.Companies
                                     .Include(c => c.Quotes)
-                                    .Where(c => c.symbol == "MCOB")
+                                    .Where(c => c.Id == "MCOB")
                                     .FirstOrDefault()
                                     .Quotes
                                     .FirstOrDefault();
 
             User User1 = dbContext.Users
-                                  .Where(c => c.UserID == "0001")
+                                  .Where(u => u.Id == "U0001")
                                   .First();
 
-            Account Account1 = dbContext.Accounts
-                                    .Where(c => c.UserID == "0001")
+            User Account1 = dbContext.Users
+                                  .Include(u => u.Accounts)
+                                  .Where(u => u.Id == "U0001")
+                                  .First();
+
+            Account Account2 = dbContext.Accounts
+                                    .Where(a => a.Id == "A000003")
                                     .First();
 
 
